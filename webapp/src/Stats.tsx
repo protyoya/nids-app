@@ -12,7 +12,6 @@ import {
   Show,
 } from "solid-js";
 import { Top, TIME_RANGE, SET_TIME_RANGE } from "./Top";
-import { Col, Container, Row } from "solid-bootstrap";
 import { timeRangeAsSeconds } from "./settings";
 import { statsAggBySensor } from "./api";
 import { Chart } from "chart.js";
@@ -87,18 +86,18 @@ const CHARTS: ChartConfig[] = [
   },
 ];
 
-// Define a color palette for different sensors
+// Define a color palette — vivid accent colours that look great with gradient fills
 const SENSOR_COLORS = [
-  { bg: "rgba(0, 90, 0, 0.3)", border: "rgba(0, 90, 0, 1)" },
-  { bg: "rgba(90, 0, 0, 0.3)", border: "rgba(90, 0, 0, 1)" },
-  { bg: "rgba(0, 0, 90, 0.3)", border: "rgba(0, 0, 90, 1)" },
-  { bg: "rgba(90, 90, 0, 0.3)", border: "rgba(90, 90, 0, 1)" },
-  { bg: "rgba(90, 0, 90, 0.3)", border: "rgba(90, 0, 90, 1)" },
-  { bg: "rgba(0, 90, 90, 0.3)", border: "rgba(0, 90, 90, 1)" },
-  { bg: "rgba(45, 45, 45, 0.3)", border: "rgba(45, 45, 45, 1)" },
-  { bg: "rgba(135, 45, 0, 0.3)", border: "rgba(135, 45, 0, 1)" },
-  { bg: "rgba(0, 135, 45, 0.3)", border: "rgba(0, 135, 45, 1)" },
-  { bg: "rgba(45, 0, 135, 0.3)", border: "rgba(45, 0, 135, 1)" },
+  { solidStart: "rgba(99, 179, 237, 1)",   solidEnd: "rgba(99, 179, 237, 0)" },   // sky
+  { solidStart: "rgba(154, 230, 180, 1)",  solidEnd: "rgba(154, 230, 180, 0)" },  // green
+  { solidStart: "rgba(252, 196, 25, 1)",   solidEnd: "rgba(252, 196, 25, 0)" },   // amber
+  { solidStart: "rgba(248, 113, 113, 1)",  solidEnd: "rgba(248, 113, 113, 0)" },  // rose
+  { solidStart: "rgba(167, 139, 250, 1)",  solidEnd: "rgba(167, 139, 250, 0)" },  // violet
+  { solidStart: "rgba(251, 146, 60, 1)",   solidEnd: "rgba(251, 146, 60, 0)" },   // orange
+  { solidStart: "rgba(52, 211, 153, 1)",   solidEnd: "rgba(52, 211, 153, 0)" },   // emerald
+  { solidStart: "rgba(232, 121, 249, 1)",  solidEnd: "rgba(232, 121, 249, 0)" },  // fuchsia
+  { solidStart: "rgba(125, 211, 252, 1)",  solidEnd: "rgba(125, 211, 252, 0)" },  // cyan
+  { solidStart: "rgba(253, 186, 116, 1)",  solidEnd: "rgba(253, 186, 116, 0)" },  // peach
 ];
 
 export function Stats(): JSX.Element {
@@ -334,11 +333,16 @@ export function Stats(): JSX.Element {
             datasets.push({
               label: sensor,
               data: values,
-              backgroundColor: color.bg,
-              borderColor: color.border,
+              // Gradient fill is applied inside buildChart via canvas API
+              _colorDef: color,
+              backgroundColor: "transparent", // placeholder — overwritten after chart init
+              borderColor: color.solidStart,
               pointRadius: 0,
-              fill: false,
+              pointHoverRadius: 4,
+              pointHoverBackgroundColor: color.solidStart,
+              fill: true,
               borderWidth: 2,
+              tension: 0.4,
             });
           });
 
@@ -357,83 +361,50 @@ export function Stats(): JSX.Element {
   return (
     <div>
       <Top excludeTimeRanges={[""]} />
-      <Container fluid>
-        <Row class={"mt-2"}>
-          <Col>
-            <form class={"d-flex flex-wrap align-items-center gap-2"}>
-              <div>
-                <RefreshButton loading={loadingCounter()} refresh={refresh} />
+      <div style="padding: 0 1.5rem 2rem;">
+        {/* Controls row */}
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <RefreshButton loading={loadingCounter()} refresh={refresh} />
+          <SensorSelect
+            selected={searchParams.sensor}
+            onchange={(sensor) => {
+              setSearchParams({ sensor: sensor });
+            }}
+          />
+          <Show when={timeRange()}>
+            <div style="margin-left: auto; display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+              <span style="font-size: 0.8rem; color: #71717a;">
+                {parse_timestamp(timeRange()!.min).format("YYYY-MM-DD HH:mm")}
+                {" — "}
+                {parse_timestamp(timeRange()!.max).format("YYYY-MM-DD HH:mm")}
+              </span>
+              <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary" onClick={navigateToPrevious}>&larr; Prev</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onClick={navigateToNext} disabled={!canNavigateNext()}>Next &rarr;</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onClick={navigateToNow} disabled={isViewingCurrentTime()}>Now</button>
               </div>
-              <div class={"d-inline-flex"}>
-                <SensorSelect
-                  selected={searchParams.sensor}
-                  onchange={(sensor) => {
-                    setSearchParams({ sensor: sensor });
-                  }}
-                />
-              </div>
-            </form>
-          </Col>
-        </Row>
-        <Show when={timeRange()}>
-          <Row class={"mt-2"}>
-            <Col>
-              <div
-                class={"d-flex justify-content-end align-items-center gap-2"}
-              >
-                <div class={"text-muted small"}>
-                  Showing data from{" "}
-                  {parse_timestamp(timeRange()!.min).format(
-                    "YYYY-MM-DD HH:mm:ss",
-                  )}{" "}
-                  to{" "}
-                  {parse_timestamp(timeRange()!.max).format(
-                    "YYYY-MM-DD HH:mm:ss",
-                  )}
-                </div>
-                <div class={"btn-group"}>
-                  <button
-                    type={"button"}
-                    class={"btn btn-sm btn-outline-secondary"}
-                    onClick={navigateToPrevious}
-                  >
-                    &larr; Previous
-                  </button>
-                  <button
-                    type={"button"}
-                    class={"btn btn-sm btn-outline-secondary"}
-                    onClick={navigateToNext}
-                    disabled={!canNavigateNext()}
-                  >
-                    Next &rarr;
-                  </button>
-                  <button
-                    type={"button"}
-                    class={"btn btn-sm btn-outline-secondary"}
-                    onClick={navigateToNow}
-                    disabled={isViewingCurrentTime()}
-                  >
-                    Now
-                  </button>
+            </div>
+          </Show>
+        </div>
+
+        {/* Bento grid */}
+        <div style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+          gap: 1.25rem;
+        ">
+          <For each={CHARTS}>
+            {(chart) => (
+              <div class="bento-card">
+                <p class="bento-card-title">{chart.title}</p>
+                <div class="bento-chart-wrap">
+                  <canvas id={chart.canvasId}></canvas>
                 </div>
               </div>
-            </Col>
-          </Row>
-        </Show>
-        <For each={CHARTS}>
-          {(chart) => (
-            <>
-              <Row>
-                <Col>
-                  <div style={"height: 200px; width: 100%"}>
-                    <canvas id={chart.canvasId}></canvas>
-                  </div>
-                </Col>
-              </Row>
-            </>
-          )}
-        </For>
-      </Container>
+            )}
+          </For>
+        </div>
+      </div>
     </div>
   );
 }
@@ -444,15 +415,27 @@ function buildChart(
   labels: Date[],
   datasets: any[],
 ): Chart<any> {
-  const ctx = (
-    document.getElementById(elementId) as HTMLCanvasElement
-  ).getContext("2d") as CanvasRenderingContext2D;
+  const canvas = document.getElementById(elementId) as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
+
+  // Build canvas gradient fills for each dataset
+  const styledDatasets = datasets.map((ds) => {
+    const color = ds._colorDef;
+    // Gradient from top (opaque) to bottom (transparent)
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.parentElement?.clientHeight || 220);
+    gradient.addColorStop(0, color.solidStart.replace(", 1)", ", 0.35)"));
+    gradient.addColorStop(1, color.solidEnd);
+    return {
+      ...ds,
+      backgroundColor: gradient,
+    };
+  });
 
   const chart = new Chart(ctx, {
     type: "line",
     data: {
       labels: labels,
-      datasets: datasets,
+      datasets: styledDatasets,
     },
     options: {
       interaction: {
@@ -464,25 +447,59 @@ function buildChart(
       scales: {
         x: {
           type: "time",
+          grid: {
+            color: "rgba(255,255,255,0.05)",
+            drawBorder: false,
+          } as any,
+          ticks: {
+            color: "#71717a",
+            font: { size: 11, family: "'Inter', system-ui, sans-serif" },
+            maxTicksLimit: 8,
+          },
+          border: { display: false },
         },
         y: {
-          afterFit: (scaleInstance) => {
-            scaleInstance.width = 100;
+          grid: {
+            color: "rgba(255,255,255,0.05)",
+            drawBorder: false,
+          } as any,
+          ticks: {
+            color: "#71717a",
+            font: { size: 11, family: "'Inter', system-ui, sans-serif" },
           },
+          afterFit: (scaleInstance) => {
+            scaleInstance.width = 80;
+          },
+          border: { display: false },
         },
       },
       plugins: {
-        title: {
-          text: title,
-          display: true,
-        },
+        title: { display: false },  // title shown via bento-card-title
         legend: {
           display: true,
           position: "top",
+          align: "end",
+          labels: {
+            color: "#a1a1aa",
+            font: { size: 11, family: "'Inter', system-ui, sans-serif" },
+            boxWidth: 12,
+            boxHeight: 12,
+            borderRadius: 3,
+            padding: 12,
+          },
         },
         tooltip: {
           mode: "index",
           intersect: false,
+          backgroundColor: "rgba(17,17,19,0.95)",
+          borderColor: "#3f3f46",
+          borderWidth: 1,
+          titleColor: "#fafafa",
+          bodyColor: "#a1a1aa",
+          titleFont: { size: 12, weight: "600", family: "'Inter', system-ui, sans-serif" },
+          bodyFont: { size: 11, family: "'Inter', system-ui, sans-serif" },
+          padding: 10,
+          cornerRadius: 8,
         },
       },
       onHover: (event, activeElements, chart) => {

@@ -15,7 +15,7 @@ import * as API from "./api";
 import { Alerts, AlertState } from "./Alerts";
 import { Loader } from "./Loader";
 import { Login } from "./Login";
-import { Settings } from "./Settings";
+import { Settings } from "./Settings.tsx";
 
 import "./styles/transitions.scss";
 import { EventView } from "./EventView";

@@ -1,215 +1,501 @@
-// Disable smooth scroll, it gets messy with keyboard shortcuts for
-// scrolling.
+// ─── shadcn/ui dark mode design tokens ──────────────────────────────────────
+//
+// We map Bootstrap's color system onto shadcn's zinc/slate palette so every
+// Bootstrap component automatically inherits the shadcn look.  All original
+// app-specific utilities are preserved below.
+
+// Disable smooth scroll (gets messy with keyboard shortcuts).
 $enable-smooth-scroll: false;
 
-// Tighten of the default table spacing in Bootstrap, by default its a
-// little large.
+// Tighten default table spacing.
 $table-cell-padding-y: 0.25rem;
 $table-cell-padding-x: 0.25rem;
 
-// Custom dark colors by Anne-Fleur.
-$evebox-warning-color-dark: #3d5f5f;
-$evebox-info-color-dark: #50656f;
-$evebox-danger-color-dark: #72383e;
+// ─── shadcn dark palette (zinc scale) ───────────────────────────────────────
+$shadcn-bg:           #09090b; // zinc-950
+$shadcn-card:         #18181b; // zinc-900
+$shadcn-popover:      #18181b;
+$shadcn-border:       #27272a; // zinc-800
+$shadcn-input:        #27272a;
+$shadcn-muted:        #27272a;
+$shadcn-muted-fg:     #a1a1aa; // zinc-400
+$shadcn-accent:       #27272a;
+$shadcn-accent-fg:    #fafafa;
+$shadcn-fg:           #fafafa; // zinc-50
+$shadcn-secondary:    #27272a;
+$shadcn-secondary-fg: #fafafa;
+$shadcn-primary:      #fafafa;
+$shadcn-primary-fg:   #09090b;
 
+// Subtle semantic tints (avoiding vivid Bootstrap defaults).
+$evebox-warning-color-dark: #3d5f5f;
+$evebox-info-color-dark:    #50656f;
+$evebox-danger-color-dark:  #72383e;
+
+// ─── Bootstrap variable overrides (dark mode first) ─────────────────────────
+$body-bg:             $shadcn-bg;
+$body-color:          $shadcn-fg;
+$border-color:        $shadcn-border;
+
+// Card
+$card-bg:             $shadcn-card;
+$card-border-color:   $shadcn-border;
+
+// Navbar
+$navbar-dark-color:           rgba($shadcn-fg, 0.75);
+$navbar-dark-hover-color:     $shadcn-fg;
+$navbar-dark-active-color:    $shadcn-fg;
+$navbar-dark-brand-color:     $shadcn-fg;
+$navbar-dark-toggler-border-color: transparent;
+
+// Dropdowns
+$dropdown-bg:              $shadcn-card;
+$dropdown-border-color:    $shadcn-border;
+$dropdown-link-color:      $shadcn-fg;
+$dropdown-link-hover-bg:   $shadcn-accent;
+$dropdown-link-hover-color: $shadcn-accent-fg;
+
+// Input / Form
+$input-bg:                 $shadcn-input;
+$input-border-color:       $shadcn-border;
+$input-color:              $shadcn-fg;
+$input-placeholder-color:  $shadcn-muted-fg;
+$input-focus-border-color: $shadcn-muted-fg;
+$input-focus-box-shadow:   none;
+
+// Buttons
+$btn-border-radius:        0.375rem;
+$btn-focus-box-shadow:     none;
+
+// Tables
+$table-color:              $shadcn-fg;
+$table-bg:                 transparent;
+$table-border-color:       $shadcn-border;
+$table-hover-bg:           rgba($shadcn-fg, 0.04);
+$table-striped-bg:         rgba($shadcn-fg, 0.03);
+
+// Toasts / Alerts
+$toast-bg:                 $shadcn-card;
+$toast-border-color:       $shadcn-border;
+$toast-color:              $shadcn-fg;
+$toast-header-bg:          $shadcn-card;
+$toast-header-color:       $shadcn-muted-fg;
+$toast-header-border-color: $shadcn-border;
+
+// Modal
+$modal-content-bg:         $shadcn-card;
+$modal-content-border-color: $shadcn-border;
+$modal-header-border-color: $shadcn-border;
+$modal-footer-border-color: $shadcn-border;
+
+// Pagination
+$pagination-bg:            $shadcn-card;
+$pagination-border-color:  $shadcn-border;
+$pagination-color:         $shadcn-fg;
+$pagination-hover-bg:      $shadcn-accent;
+$pagination-hover-color:   $shadcn-accent-fg;
+
+// Misc
+$link-color:               $shadcn-fg;
+$link-hover-color:         $shadcn-muted-fg;
+
+// ─── Bootstrap (must come after variable overrides) ─────────────────────────
 @import "bootstrap/scss/bootstrap";
 @import "../../node_modules/pretty-print-json/dist/css/pretty-print-json.css";
 @import "transitions";
 
-// App specific style to force the width of an element to 1em.
+// ─── Global base ─────────────────────────────────────────────────────────────
+:root {
+  --am-bg:           #{$shadcn-bg};
+  --am-card:         #{$shadcn-card};
+  --am-border:       #{$shadcn-border};
+  --am-muted:        #{$shadcn-muted-fg};
+  --am-fg:           #{$shadcn-fg};
+  --am-radius:       0.5rem;
+  --am-font:         'Inter', system-ui, -apple-system, sans-serif;
+}
+
+html, body {
+  background-color: var(--am-bg) !important;
+  color: var(--am-fg) !important;
+  font-family: var(--am-font) !important;
+  font-size: 1rem;
+  -webkit-font-smoothing: antialiased;
+  padding-top: 6rem; // Clears the new floating pill navbar
+}
+
+// Force dark theme attribute at all times
+html {
+  color-scheme: dark;
+}
+
+// ─── Navbar (shadcn sidebar/top bar style) ───────────────────────────────────
+.modern-floating-nav {
+  // Pill structure
+  background-color: rgba(31, 31, 31, 0.6) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #333 !important;
+  border-radius: 9999px; // Pill shape requested by user
+  padding: 0.5rem 1.5rem !important;
+
+  // Since we limit width, let's allow it to wrap properly or stay small
+  max-width: 1200px;
+  width: 100%;
+  
+  // Undo old navbar padding
+  margin: 0 auto;
+
+  // Ensure content aligns well within the pill
+  .container-fluid {
+    gap: 1.25rem;
+  }
+
+  .navbar-brand {
+    padding-right: 0.5rem;
+    margin-right: 0.5rem;
+    // We remove the separator block because the minimalist logo looks better bare, 
+    // or keep a very subtle gap
+  }
+
+  // Left-side nav items: more horizontal gap
+  .me-auto.nav {
+    gap: 0.5rem;
+  }
+
+  .nav-link {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(250,250,250,0.7) !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 9999px; // Pill-shaped hover states
+    transition: color 0.2s ease, background-color 0.2s ease;
+
+    &:hover, &.active {
+      color: #fff !important;
+      background-color: rgba(255,255,255,0.1);
+    }
+  }
+
+  .dropdown-toggle {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: rgba(250,250,250,0.7) !important;
+
+    &::after {
+      opacity: 0.5;
+    }
+  }
+
+  // Right-side nav: space out the controls
+  .navbar-nav:not(.me-auto) {
+    gap: 0.5rem;
+    align-items: center;
+  }
+}
+
+// Add our Tailwind-like helper classes in case they don't exist
+.pointer-events-none { pointer-events: none; }
+.pointer-events-auto { pointer-events: auto; }
+.fixed { position: fixed; }
+.top-0 { top: 0; }
+.left-0 { left: 0; }
+.right-0 { right: 0; }
+.z-\[1030\] { z-index: 1030; }
+.flex { display: flex; }
+.justify-center { justify-content: center; }
+.items-center { align-items: center; }
+.p-4 { padding: 1rem; }
+.shadow-2xl { box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
+.text-white { color: #fff; }
+
+// ─── Dropdown menu ───────────────────────────────────────────────────────────
+.dropdown-menu {
+  background-color: var(--am-card);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  padding: 0.3rem;
+  font-size: 0.85rem;
+
+  .dropdown-item {
+    border-radius: 0.3rem;
+    color: var(--am-fg);
+    padding: 0.4rem 0.65rem;
+    transition: background-color 0.1s ease;
+
+    &:hover, &:focus {
+      background-color: rgba(255, 255, 255, 0.06);
+      color: var(--am-fg);
+    }
+
+    &:active {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+  }
+}
+
+// ─── Buttons ─────────────────────────────────────────────────────────────────
+.btn {
+  border-radius: 0.375rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.btn-primary {
+  background-color: var(--am-fg);
+  color: var(--am-bg);
+  border-color: var(--am-fg);
+
+  &:hover {
+    background-color: rgba(250, 250, 250, 0.85);
+    border-color: rgba(250, 250, 250, 0.85);
+    color: var(--am-bg);
+  }
+}
+
+.btn-secondary, .btn-outline-secondary {
+  background-color: transparent;
+  color: var(--am-fg);
+  border-color: var(--am-border);
+
+  &:hover {
+    background-color: rgba(255,255,255,0.06);
+    border-color: var(--am-muted);
+    color: var(--am-fg);
+  }
+}
+
+.btn-danger {
+  background-color: #7f1d1d;
+  border-color: #991b1b;
+  color: #fca5a5;
+  &:hover {
+    background-color: #991b1b;
+    border-color: #b91c1c;
+  }
+}
+
+// ─── Forms / Inputs ──────────────────────────────────────────────────────────
+.form-control, .form-select {
+  background-color: var(--am-card) !important;
+  border: 1px solid var(--am-border) !important;
+  color: var(--am-fg) !important;
+  border-radius: 0.375rem;
+  font-size: 0.85rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: var(--am-muted) !important;
+    box-shadow: 0 0 0 2px rgba(161, 161, 170, 0.15) !important;
+    background-color: var(--am-card) !important;
+    color: var(--am-fg) !important;
+  }
+
+  &::placeholder {
+    color: var(--am-muted) !important;
+  }
+
+  option {
+    background-color: var(--am-card);
+    color: var(--am-fg);
+  }
+}
+
+// ─── Tables ──────────────────────────────────────────────────────────────────
+.table {
+  color: var(--am-fg);
+  border-color: var(--am-border);
+  font-size: 0.85rem;
+
+  thead th {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+    color: var(--am-muted);
+    font-weight: 500;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    border-bottom: 1px solid var(--am-border);
+  }
+
+  tbody tr {
+    border-color: var(--am-border);
+    transition: background-color 0.1s ease;
+
+    &:hover {
+      background-color: rgba(255,255,255,0.03);
+    }
+  }
+
+  td {
+    border-color: var(--am-border);
+    vertical-align: middle;
+  }
+}
+
+// App-specific table column sizing
+.app-event-table {
+  .col-timestamp  { white-space: nowrap; width: 1%; }
+  .col-address    { white-space: nowrap; width: 1%; }
+  .col-event-type { white-space: nowrap; width: 1%; }
+  .col-count      { white-space: nowrap; width: 1%; }
+
+  tbody tr { cursor: pointer; }
+
+  tr { --bs-table-border-color: var(--am-border); }
+
+  .table-info {
+    --bs-table-bg: rgba(255, 255, 255, 0.04) !important;
+    --bs-table-color: var(--am-fg) !important;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.07) !important;
+    --bs-table-hover-color: var(--am-fg) !important;
+  }
+
+  .table-warning {
+    --bs-table-bg: rgba(255, 255, 255, 0.02) !important;
+    --bs-table-color: var(--am-fg) !important;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.05) !important;
+    --bs-table-hover-color: var(--am-fg) !important;
+  }
+
+  .table-success {
+    --bs-table-bg: transparent !important;
+    --bs-table-color: var(--am-fg) !important;
+    --bs-table-hover-bg: rgba(255, 255, 255, 0.03) !important;
+    --bs-table-hover-color: var(--am-fg) !important;
+  }
+
+  .table-danger {
+    --bs-table-bg: rgba(255, 0, 0, 0.05) !important;
+    --bs-table-color: var(--am-fg) !important;
+    --bs-table-hover-bg: rgba(255, 0, 0, 0.08) !important;
+    --bs-table-hover-color: var(--am-fg) !important;
+  }
+}
+
+// ─── Cards ───────────────────────────────────────────────────────────────────
+.card {
+  background-color: var(--am-card) !important;
+  border: 1px solid var(--am-border) !important;
+  border-radius: var(--am-radius);
+}
+
+// ─── Bento grid cards (Stats page) ───────────────────────────────────────────
+.bento-card {
+  background-color: #111113;
+  border: 1px solid #2a2a2e;
+  border-radius: 1rem;
+  padding: 1.5rem 1.75rem 1.25rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &:hover {
+    border-color: #3f3f46;
+    box-shadow: 0 4px 32px rgba(0, 0, 0, 0.45);
+  }
+
+  .bento-card-title {
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #71717a;
+    margin: 0;
+  }
+
+  .bento-chart-wrap {
+    position: relative;
+    height: 220px;
+    width: 100%;
+  }
+}
+
+// ─── Alerts (Bootstrap alert component) ──────────────────────────────────────
+.alert-info {
+  background-color: $evebox-info-color-dark;
+  border-color: lighten($evebox-info-color-dark, 8%);
+  color: #e2e8f0;
+}
+
+.alert-warning {
+  background-color: $evebox-warning-color-dark;
+  border-color: lighten($evebox-warning-color-dark, 8%);
+  color: #e2e8f0;
+}
+
+.alert-danger {
+  background-color: $evebox-danger-color-dark;
+  border-color: lighten($evebox-danger-color-dark, 8%);
+  color: #fca5a5;
+}
+
+// ─── Toasts / Notifications ───────────────────────────────────────────────────
+.toast {
+  background-color: var(--am-card);
+  border: 1px solid var(--am-border);
+  color: var(--am-fg);
+  border-radius: var(--am-radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+
+  .toast-header {
+    background-color: var(--am-card);
+    border-bottom: 1px solid var(--am-border);
+    color: var(--am-muted);
+  }
+}
+
+// ─── Modal ────────────────────────────────────────────────────────────────────
+.modal-content {
+  background-color: var(--am-card);
+  border: 1px solid var(--am-border);
+  border-radius: var(--am-radius);
+  color: var(--am-fg);
+}
+
+.modal-header, .modal-footer {
+  border-color: var(--am-border);
+}
+
+// ─── Badges ───────────────────────────────────────────────────────────────────
+.badge {
+  font-weight: 500;
+  font-size: 0.7rem;
+  border-radius: 0.3rem;
+}
+
+// ─── Pretty-print JSON ───────────────────────────────────────────────────────
+.json-container {
+  background-color: inherit !important;
+  color: var(--am-fg);
+}
+
+// ─── Suricata rule syntax highlighting ───────────────────────────────────────
+.rule {
+  .rule-header-action  { font-weight: 600; color: var(--am-fg); }
+  .rule-header-proto   { font-weight: 600; font-style: italic; color: #94a3b8; }
+  .rule-header-addr    { color: var(--am-muted); }
+  .rule-header-port    { color: #64748b; }
+  .rule-header-direction { font-weight: 600; }
+  .rule-keyword        { color: #7dd3fc; font-weight: 600; }   // sky-300
+  .rule-keyword-value  { color: #86efac; }                     // green-300
+}
+
+// ─── Misc utilities (unchanged from original) ─────────────────────────────────
+
 .app-w-1 {
   width: 1em !important;
   max-width: 1em !important;
 }
 
-.app-refresh-button-wrap {
-  z-index: 2;
-}
+.app-refresh-button-wrap { z-index: 2; }
+.app-refresh-button      { width: 7em; }
+.app-refresh-button-badge { z-index: 3; }
 
-.app-refresh-button {
-  width: 7em;
-}
+.invisible { visibility: hidden; }
 
-.app-refresh-button-badge {
-  z-index: 3;
-}
-
-.app-event-table {
-  .col-timestamp {
-    white-space: nowrap;
-    width: 1%;
-  }
-
-  .col-address {
-    white-space: nowrap;
-    width: 1%;
-  }
-
-  .col-event-type {
-    white-space: nowrap;
-    width: 1%;
-  }
-
-  .col-count {
-    white-space: nowrap;
-    width: 1%;
-  }
-
-  tbody {
-    tr {
-      cursor: pointer;
-    }
-  }
-}
-
-// Pretty-json overrides for dark theme. Not needed for light theme.
-[data-bs-theme="dark"] {
-  .json-container {
-    background-color: inherit !important;
-  }
-}
-
-[data-bs-theme="dark"] {
-  // Override the background color in table headers, as its a little
-  // too dark in the default dark theme.
-  .table {
-    th {
-      background-color: $body-tertiary-bg-dark;
-    }
-  }
-
-  // Color overrides for event tables.
-  .app-event-table {
-    tr {
-      --bs-table-border-color: black;
-    }
-
-    .table-info {
-      $_color: $evebox-info-color-dark;
-      $_hover: tint-color($_color, 10%);
-      --bs-table-bg: #{$_color} !important;
-      --bs-table-color: white !important;
-      --bs-table-hover-bg: #{$_hover} !important;
-      --bs-table-hover-color: white !important;
-    }
-
-    .table-warning {
-      $_color: $evebox-warning-color-dark;
-      $_hover: tint-color($_color, 10%);
-      --bs-table-bg: #{$_color} !important;
-      --bs-table-color: white !important;
-      --bs-table-hover-bg: #{$_hover} !important;
-      --bs-table-hover-color: white !important;
-    }
-
-    .table-success {
-      $_color: #2f4741;
-      $_hover: tint-color($_color, 10%);
-      --bs-table-bg: #{$_color} !important;
-      --bs-table-color: white !important;
-      --bs-table-hover-bg: #{$_hover} !important;
-      --bs-table-hover-color: white !important;
-    }
-
-    .table-danger {
-      $_color: $evebox-danger-color-dark;
-      $_hover: tint-color($_color, 10%);
-      --bs-table-bg: #{$_color} !important;
-      --bs-table-color: white !important;
-      --bs-table-hover-bg: #{$_hover} !important;
-      --bs-table-hover-color: white !important;
-    }
-  }
-}
-
-// Rule styling for dark mode.
-[data-bs-theme="dark"] {
-  .rule {
-    .rule-header-action {
-      font-weight: bold;
-    }
-
-    .rule-header-proto {
-      font-weight: bold;
-      font-style: italic;
-    }
-
-    .rule-header-addr {
-    }
-
-    .rule-header-port {
-    }
-
-    .rule-keyword {
-      color: dodgerblue;
-      font-weight: bold;
-    }
-
-    .rule-keyword-value {
-      color: lawngreen;
-    }
-  }
-}
-
-// Rule styling for light mode.
-[data-bs-theme="light"] {
-  .rule {
-    .rule-header-action {
-      font-weight: bold;
-    }
-
-    .rule-header-proto {
-      font-weight: bold;
-      font-style: italic;
-    }
-
-    .rule-header-addr {
-      color: dimgrey;
-    }
-
-    .rule-header-port {
-      color: slategrey;
-    }
-
-    .rule-header-direction {
-      font-weight: bold;
-    }
-
-    .rule-keyword {
-      color: blue;
-      font-weight: bold;
-    }
-
-    .rule-keyword-value {
-      color: green;
-    }
-  }
-}
-
-[data-bs-theme="dark"] {
-  .alert-info {
-    --bs-alert-bg: #{$evebox-info-color-dark};
-    --bs-alert-color: white;
-  }
-
-  .alert-warning {
-    --bs-alert-bg: #{$evebox-warning-color-dark};
-    --bs-alert-color: white;
-  }
-
-  .alert-danger {
-    --bs-alert-bg: #{$evebox-danger-color-dark};
-    --bs-alert-color: white;
-  }
-}
-
-// Make an element invisible. Useful when loading then transitioning
-// to visible.
-.invisible {
-  visibility: hidden;
-}
-
-// Force wrapping of text no matter what.
 .force-wrap {
   word-break: break-word !important;
   word-wrap: break-word !important;
@@ -218,63 +504,48 @@ $evebox-danger-color-dark: #72383e;
 }
 
 .app-detail-table {
-  td:first-child {
-    padding-left: 1em;
-  }
-
-  td:last-child {
-    padding-right: 1em;
-  }
-
-  tbody {
-    th:first-child {
-      padding-left: 1em;
-      padding-right: 1em;
-    }
-  }
-
-  a:link {
-    text-decoration: none;
-  }
+  td:first-child { padding-left: 1em; }
+  td:last-child  { padding-right: 1em; }
+  tbody th:first-child { padding-left: 1em; padding-right: 1em; }
+  a:link { text-decoration: none; }
 }
 
 .app-count-value-data-table {
-  tbody {
-    tr:last-child {
-      td {
-        border: none;
-      }
-    }
-  }
+  tbody tr:last-child td { border: none; }
 }
 
-// Used to hide "filter" buttons. We use opacity so the space is
-// reserved, preventing reflow on hover.
-.show-on-hover {
-  opacity: 0;
-}
+// Show filter icons only on row hover.
+.show-on-hover { opacity: 0; }
+td:hover .show-on-hover { opacity: 1; display: inline; }
 
-td:hover .show-on-hover {
-  opacity: 1;
-  display: inline;
-}
-
+// Filter strip buttons.
 .filter-button-for {
   @extend .btn-outline-secondary;
-  &:hover {
-    text-decoration: none;
-    color: inherit;
-    background: none;
-  }
+  &:hover { text-decoration: none; color: inherit; background: none; }
 }
 
 .filter-button-out {
   @extend .btn-outline-secondary;
-  border: 1px solid $danger;
+  border: 1px solid #991b1b;
   &:hover {
     text-decoration: none;
     color: inherit;
     background: none;
-    border: 1px solid $danger;
+    border: 1px solid #991b1b;
   }
+}
+
+// ─── Scrollbar (subtle dark style) ───────────────────────────────────────────
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--am-bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--am-border);
+  border-radius: 3px;
+  &:hover { background: var(--am-muted); }
+}
+
+// ─── Selection ────────────────────────────────────────────────────────────────
+::selection {
+  background: rgba(250, 250, 250, 0.15);
+  color: var(--am-fg);
 }

@@ -6,7 +6,7 @@ import { TIME_RANGE } from "./Top";
 import { parse_timerange } from "./datetime";
 import { Chart } from "chart.js";
 
-const DEFAULT_THEME = "light";
+const DEFAULT_THEME = "dark";
 
 export const [currentThemeName, setCurrentThemeName] =
   createSignal(DEFAULT_THEME);
@@ -35,11 +35,11 @@ export function setTheme(name: string) {
 export function loadInitialTheme() {
   const localTheme = localStorage.getItem("THEME");
   switch (localTheme) {
-    case "dark":
-      setTheme("dark");
+    case "light":
+      setTheme("light");
       break;
     default:
-      setTheme("light");
+      setTheme("dark");
       break;
   }
 }

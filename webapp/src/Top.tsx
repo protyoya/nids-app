@@ -12,6 +12,7 @@ import { QUEUE_SIZE, SERVER_REVISION } from "./api";
 import * as api from "./api";
 import { GIT_REV } from "./gitrev";
 import { serverConfig } from "./config";
+import gramaxLogo from "./assets/gramax_logo.png";
 import { IS_AUTHENTICATED } from "./global";
 
 export const [showHelp, setShowHelp] = createSignal(false);
@@ -91,7 +92,7 @@ export function Top(props: {
   console.log(`Top: disableRange=${props.disableRange}`);
   const navigate = useNavigate();
   const [_searchParams, setSearchParams] = useSearchParams();
-  const brand = props.brand || "EveBox";
+  const brand = props.brand || "AdrieMarine";
 
   // Filter time range options based on excludeTimeRanges prop
   const timeRangeOptions = props.excludeTimeRanges
@@ -175,9 +176,18 @@ export function Top(props: {
   return (
     <>
       <HelpModal />
-      <Navbar collapseOnSelect expand="lg" class="bg-body-tertiary">
-        <Container fluid>
-          <Navbar.Brand href="/">{brand}</Navbar.Brand>
+      <div class="fixed top-0 left-0 right-0 z-[1030] flex justify-center p-4 pointer-events-none">
+        <Navbar collapseOnSelect expand="lg" class="modern-floating-nav pointer-events-auto shadow-2xl">
+          <Container fluid>
+            <Navbar.Brand href="/" class="flex items-center">
+              <div style="background: white; border-radius: 8px; padding: 4px 10px; display: flex; align-items: center;">
+                <img
+                  src={gramaxLogo}
+                  alt="Gramax"
+                  style="height: 28px; width: auto; display: block;"
+                />
+              </div>
+            </Navbar.Brand>
           <Navbar.Toggle />
           <Navbar.Collapse id="responsive-navbar-nav">
             <Nav class="me-auto">
@@ -221,7 +231,7 @@ export function Top(props: {
                 </A>
               </NavDropdown>
             </Nav>
-            <Nav>
+            <Nav class="align-items-center gap-2">
               <Show
                 when={SERVER_REVISION() != null && SERVER_REVISION() != GIT_REV}
               >
@@ -293,7 +303,7 @@ export function Top(props: {
                 <button
                   type="button"
                   class="btn btn-secondary btn-sm"
-                  style="margin-top: 5px !important; font-family: monospace;"
+                  style="font-family: monospace;"
                 >
                   {QUEUE_SIZE()}
                 </button>
@@ -302,6 +312,7 @@ export function Top(props: {
           </Navbar.Collapse>
         </Container>
       </Navbar>
+      </div>
     </>
   );
 }

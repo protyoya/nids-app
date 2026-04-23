@@ -458,182 +458,149 @@ export function Overview() {
   return (
     <>
       <Top />
-      <div class="container-fluid">
-        <div class="row">
-          <div class="mt-2 col">
-            <form class="d-flex flex-wrap align-items-center gap-2">
-              <div>
-                <RefreshButton loading={loading()} refresh={refresh} />
-              </div>
-              <div class="d-inline-flex">
-                <SensorSelect
-                  selected={searchParams.sensor}
-                  onchange={(sensor) => {
-                    setSearchParams({ sensor: sensor });
-                  }}
-                />
-              </div>
-            </form>
-          </div>
+      <div style="padding: 0 1.5rem 2rem;">
+        {/* Debug. */}
+        <Show when={localStorage.getItem("DEBUG") !== null}>
+          {JSON.stringify(
+            {
+              "eventStore.events.length": eventStore.events.length,
+              "eventStore.active._id": eventStore.active?._id || null,
+              "eventStore.viewOffset": eventStore.viewOffset,
+              "eventStore.cursor": eventStore.cursor,
+            },
+            null,
+            1,
+          )}
+        </Show>
+
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;">
+          <RefreshButton loading={loading()} refresh={refresh} />
+          <SensorSelect
+            selected={searchParams.sensor}
+            onchange={(sensor) => {
+              setSearchParams({ sensor: sensor });
+            }}
+          />
         </div>
 
-        <div class="row">
-          <div class="mt-2 col col-lg-10 col-md-8 col-sm-12">
-            <div class="card">
-              <div class="card-header d-flex">
-                <b>Events by Type Over Time</b>
-                <Show when={eventsOverTimeLoading() > 0}>
-                  <button
-                    class="btn ms-auto"
-                    type="button"
-                    disabled
-                    style="border: 0; padding: 0;"
-                  >
-                    <span
-                      class="spinner-border spinner-border-sm"
-                      aria-hidden="true"
-                    ></span>
-                    <span class="visually-hidden" role="status">
-                      Loading...
-                    </span>
-                  </button>
-                </Show>
-              </div>
-              <div class="card-body p-0">
-                <div class="chart-container" style="position; relative;">
-                  <canvas
-                    id="histogram"
-                    style="max-height: 180px; height: 180px;"
-                  ></canvas>
+        <div style="
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(520px, 1fr));
+          gap: 1.25rem;
+        ">
+
+          <div class="bento-card" style="grid-column: 1 / -1;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <p class="bento-card-title">Events by Type Over Time</p>
+              <Show when={eventsOverTimeLoading() > 0}>
+                <span class="spinner-border spinner-border-sm text-muted" aria-hidden="true"></span>
+              </Show>
+            </div>
+            <div class="bento-chart-wrap" style="height: 180px;">
+              <canvas id="histogram"></canvas>
+            </div>
+          </div>
+
+          <div class="bento-card flex flex-col" style="height: 100%;">
+            <div style="padding-bottom: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <p class="bento-card-title" style="margin-bottom: 0.25rem;">Protocols</p>
+                  <p style="font-size: 0.875rem; color: #a1a1aa; margin: 0;">Traffic distribution by protocol</p>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div class="mt-2 col col-lg-2 col-md-4 col-sm-12">
-            <div class="card">
-              <div class="card-header d-flex">
-                Protocols
-                <Show
-                  when={protocols.loading !== undefined && protocols.loading}
-                >
-                  {/* Loader in a button for placement reason's. */}
-                  <button
-                    class="btn ms-auto"
-                    type="button"
-                    disabled
-                    style="border: 0; padding: 0;"
-                  >
-                    <span
-                      class="spinner-border spinner-border-sm"
-                      aria-hidden="true"
-                    ></span>
-                    <span class="visually-hidden" role="status">
-                      Loading...
-                    </span>
-                  </button>
+                <Show when={protocols.loading !== undefined && protocols.loading}>
+                  <span class="spinner-border spinner-border-sm text-muted" aria-hidden="true"></span>
                 </Show>
               </div>
-              <div class="card-body p-0">
-                <PieChart data={protocols.data} ref={protocolsPieChartRef} />
+            </div>
+            <div class="bento-chart-wrap" style="flex: 1; display: flex; justify-content: center; align-items: center; min-height: 220px; padding-top: 1rem;">
+              <PieChart data={protocols.data} ref={protocolsPieChartRef} />
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; font-size: 0.875rem; margin-top: 1rem; border-top: 1px solid #27272a; padding-top: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem; font-weight: 500; line-height: 1;">
+                Trending up by 5.2% this month
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline>
+                  <polyline points="16 7 22 7 22 13"></polyline>
+                </svg>
+              </div>
+              <div style="line-height: 1; color: #a1a1aa;">
+                Showing protocol distribution for the recorded window
               </div>
             </div>
           </div>
-        </div>
 
-        <div class="row mt-2">
-          <div class="col">
-            <CountValueDataTable
-              title="Top Alerts"
-              label="Signature"
-              rows={topAlerts.rows}
-              loading={topAlerts.loading}
-              searchField="alert.signature"
-              suffix={formatSuffix(topAlerts.timestamp)}
-            />
-          </div>
-          <div class="col">
-            <CountValueDataTable
-              title="Top DNS Reqeuests"
-              label="Hostname"
-              rows={topDnsRequests.rows}
-              loading={topDnsRequests.loading}
-              searchField="dns.rrname"
-              suffix={formatSuffix(topDnsRequests.timestamp)}
-            />
-          </div>
-        </div>
+          <CountValueDataTable
+            title="Top Alerts"
+            label="Signature"
+            rows={topAlerts.rows}
+            loading={topAlerts.loading}
+            searchField="alert.signature"
+            suffix={formatSuffix(topAlerts.timestamp)}
+          />
+          <CountValueDataTable
+            title="Top DNS Requests"
+            label="Hostname"
+            rows={topDnsRequests.rows}
+            loading={topDnsRequests.loading}
+            searchField="dns.rrname"
+            suffix={formatSuffix(topDnsRequests.timestamp)}
+          />
 
-        <div class="row mt-2">
-          <div class="col">
-            <CountValueDataTable
-              title="Top TLS SNI"
-              label="Hostname"
-              rows={topTlsSni.rows}
-              loading={topTlsSni.loading}
-              searchField="tls.sni"
-              suffix={formatSuffix(topTlsSni.timestamp)}
-            />
-          </div>
-          <div class="col">
-            <CountValueDataTable
-              title="Top Quic SNI"
-              label="Hostname"
-              rows={topQuicSni.rows}
-              loading={topQuicSni.loading}
-              searchField="quic.sni"
-              suffix={formatSuffix(topQuicSni.timestamp)}
-            />
-          </div>
-        </div>
+          <CountValueDataTable
+            title="Top TLS SNI"
+            label="Hostname"
+            rows={topTlsSni.rows}
+            loading={topTlsSni.loading}
+            searchField="tls.sni"
+            suffix={formatSuffix(topTlsSni.timestamp)}
+          />
+          <CountValueDataTable
+            title="Top Quic SNI"
+            label="Hostname"
+            rows={topQuicSni.rows}
+            loading={topQuicSni.loading}
+            searchField="quic.sni"
+            suffix={formatSuffix(topQuicSni.timestamp)}
+          />
 
-        <div class="row mt-2">
-          <div class="col">
-            <CountValueDataTable
-              title="Top Source IP Addresses"
-              label="IP Address"
-              rows={topSourceIp.rows}
-              loading={topSourceIp.loading}
-              searchField="src_ip"
-              suffix={formatSuffix(topSourceIp.timestamp)}
-              tooltip="Based on flow events"
-            />
-          </div>
-          <div class="col">
-            <CountValueDataTable
-              title="Top Destination IP Addresses"
-              label="IP Address"
-              rows={topDestIp.rows}
-              loading={topDestIp.loading}
-              searchField="dest_ip"
-              suffix={formatSuffix(topDestIp.timestamp)}
-              tooltip="Based on flow events"
-            />
-          </div>
-        </div>
+          <CountValueDataTable
+            title="Top Source IP Addresses"
+            label="IP Address"
+            rows={topSourceIp.rows}
+            loading={topSourceIp.loading}
+            searchField="src_ip"
+            suffix={formatSuffix(topSourceIp.timestamp)}
+            tooltip="Based on flow events"
+          />
+          <CountValueDataTable
+            title="Top Destination IP Addresses"
+            label="IP Address"
+            rows={topDestIp.rows}
+            loading={topDestIp.loading}
+            searchField="dest_ip"
+            suffix={formatSuffix(topDestIp.timestamp)}
+            tooltip="Based on flow events"
+          />
 
-        <div class="row mt-2">
-          <div class="col">
-            <CountValueDataTable
-              title="Top Source Ports"
-              label="Port"
-              rows={topSourcePort.rows}
-              loading={topSourcePort.loading}
-              searchField="src_port"
-              suffix={formatSuffix(topSourcePort.timestamp)}
-              tooltip="Based on flow events"
-            />
-          </div>
-          <div class="col">
-            <CountValueDataTable
-              title="Top Destination Ports"
-              label="Port"
-              rows={topDestPort.rows}
-              loading={topDestPort.loading}
-              searchField="dest_port"
-              suffix={formatSuffix(topDestPort.timestamp)}
-              tooltip="Based on flow events"
-            />
-          </div>
+          <CountValueDataTable
+            title="Top Source Ports"
+            label="Port"
+            rows={topSourcePort.rows}
+            loading={topSourcePort.loading}
+            searchField="src_port"
+            suffix={formatSuffix(topSourcePort.timestamp)}
+            tooltip="Based on flow events"
+          />
+          <CountValueDataTable
+            title="Top Destination Ports"
+            label="Port"
+            rows={topDestPort.rows}
+            loading={topDestPort.loading}
+            searchField="dest_port"
+            suffix={formatSuffix(topDestPort.timestamp)}
+            tooltip="Based on flow events"
+          />
         </div>
       </div>
     </>
@@ -651,6 +618,14 @@ function PieChart(props: { data: any[]; ref?: any }) {
       chart.destroy();
     }
 
+    const shadcnBlueColors = [
+      "#2563eb", // blue-600
+      "#3b82f6", // blue-500
+      "#60a5fa", // blue-400
+      "#93c5fd", // blue-300
+      "#bfdbfe", // blue-200
+    ];
+
     chart = new Chart(element, {
       type: "pie",
       data: {
@@ -659,32 +634,33 @@ function PieChart(props: { data: any[]; ref?: any }) {
           {
             data: props.data.map((e) => e.count),
             backgroundColor: props.data.map(
-              (_, i) => Colors[i % Colors.length],
+              (_, i) => shadcnBlueColors[i % shadcnBlueColors.length],
             ),
-            borderColor: props.data.map((_, i) => Colors[i % Colors.length]),
-            borderWidth: 1,
+            borderColor: "rgba(24, 24, 27, 1)", // matches bento-card bg
+            borderWidth: 2,
+            hoverOffset: 4,
           },
         ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        layout: {
+          padding: 10,
+        },
         plugins: {
           legend: {
-            display: true,
-            labels: {
-              font: {
-                size: 10,
-              },
-            },
-            onHover: (_evt, legendItem) => {
-              const activeElement = {
-                datasetIndex: 0,
-                index: legendItem.index,
-              };
-              chart.tooltip.setActiveElements([activeElement]);
-              chart.update();
-            },
+            display: false,
+          },
+          tooltip: {
+            backgroundColor: "#18181b",
+            titleColor: "#fafafa",
+            bodyColor: "#fafafa",
+            borderColor: "#27272a",
+            borderWidth: 1,
+            padding: 12,
+            displayColors: true,
+            boxPadding: 4,
           },
         },
       },
@@ -693,15 +669,7 @@ function PieChart(props: { data: any[]; ref?: any }) {
 
   return (
     <>
-      <div>
-        <div class="chart-container" style="height: 180px; position; relative;">
-          <canvas
-            ref={props.ref}
-            id={chartId}
-            style="max-height: 150px; height: 150px;"
-          ></canvas>
-        </div>
-      </div>
+      <canvas ref={props.ref} id={chartId}></canvas>
     </>
   );
 }

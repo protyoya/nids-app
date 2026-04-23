@@ -56,14 +56,14 @@ export function CountValueDataTable(props: {
 
   return (
     <>
-      <div class="card app-count-value-data-table">
-        <div class="card-header d-flex">
-          <div class="d-flex align-items-center">
+      <div class="bento-card app-count-value-data-table">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <div class="bento-card-title d-flex align-items-center" style="margin-bottom: 0; text-transform: uppercase;">
             {title()}
             <Show when={props.tooltip}>
               <span
                 ref={tooltipRef}
-                class="ms-1"
+                class="ms-2"
                 data-bs-toggle="tooltip"
                 data-bs-placement="top"
                 title={props.tooltip}
@@ -72,30 +72,26 @@ export function CountValueDataTable(props: {
               </span>
             </Show>
           </div>
-          <div class="ms-auto d-flex align-items-center">
+          <div class="d-flex align-items-center">
             <Show when={props.loading !== undefined && props.loading}>
-              {/* Loader for placement reason's. */}
-              <div>
+              <div class="d-flex align-items-center">
                 <span class="me-2 small text-muted fst-italic">
                   {suffix()}{" "}
                 </span>
                 <span
-                  class="spinner-border spinner-border-sm"
+                  class="spinner-border spinner-border-sm text-muted"
                   aria-hidden="true"
                 ></span>
-                <span class="visually-hidden" role="status">
-                  Loading...
-                </span>
               </div>
             </Show>
           </div>
         </div>
         <Show when={props.rows.length == 0}>
-          <div class="card-body">No data</div>
+          <div style="color: var(--am-muted); font-size: 0.85rem; padding: 1rem;">No data</div>
         </Show>
         <Show when={props.rows.length > 0}>
-          <div class="card-body p-0">
-            <table class="table" style="margin-bottom: 3px;">
+          <div style="flex-grow: 1; overflow-y: auto;">
+            <table class="table table-sm" style="margin-bottom: 0; font-size: 0.85rem;">
               <thead>
                 <tr>
                   <th style={"width: 6em;"}>#</th>

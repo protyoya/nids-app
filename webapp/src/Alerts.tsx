@@ -751,33 +751,31 @@ export function Alerts() {
   return (
     <>
       <Top />
-      <Container fluid class={"mt-2 mb-2"}>
+      <div style="padding: 0 1.5rem 2rem;">
         {/* Debug. */}
         <Show when={localStorage.getItem("DEBUG") !== null}>
-          <Row class={"mt-2 mb-2"}>
-            <Col>
-              {JSON.stringify(
-                {
-                  "eventStore.events.length": eventStore.events.length,
-                  "visibleEvents().length": visibleEvents().length,
-                  "eventStore.active._id": eventStore.active?._id || null,
-                  "cursor()": cursor(),
-                  "eventStore.viewOffset": eventStore.viewOffset,
-                  "eventStore.cursor": eventStore.cursor,
-                },
-                null,
-                1,
-              )}
-            </Col>
-          </Row>
+          <div style="margin-bottom: 1rem;">
+            {JSON.stringify(
+              {
+                "eventStore.events.length": eventStore.events.length,
+                "visibleEvents().length": visibleEvents().length,
+                "eventStore.active._id": eventStore.active?._id || null,
+                "cursor()": cursor(),
+                "eventStore.viewOffset": eventStore.viewOffset,
+                "eventStore.cursor": eventStore.cursor,
+              },
+              null,
+              1,
+            )}
+          </div>
         </Show>
         {/* For mobile detection. */}
         <div style={"height: 0; width: 0"}>
           <span class={"d-none d-sm-block"}></span>
           <span id="small-only" class={"d-block d-sm-none"}></span>
         </div>
-        <Row>
-          <Col class="d-flex flex-wrap align-items-center gap-2">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 0.5rem; margin-bottom: 1rem;">
+          <div class="d-flex flex-wrap align-items-center gap-2">
             <Show when={!isLoading()}>
               <button
                 class={"btn btn-primary app-refresh-button"}
@@ -828,8 +826,8 @@ export function Alerts() {
                 }}
               />
             </div>
-          </Col>
-          <Col>
+          </div>
+          <div style="flex-grow: 1;">
             <Form
               class="input-group"
               onsubmit={(e) => {
@@ -867,8 +865,8 @@ export function Alerts() {
                 Clear
               </button>
             </Form>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         {/* Filter strip. */}
         <Show when={filters().length > 0}>
@@ -890,11 +888,12 @@ export function Alerts() {
         </div>
         <Transition name={"fade"}>
           {visibleEvents().length > 0 && (
-            <div>
-              <table
-                class={"table table-hover mt-2 app-event-table"}
-                style={"margin-bottom: 0;"}
-              >
+            <div class="bento-card" style="padding: 0; overflow: hidden; margin-top: 1rem;">
+              <div style="overflow-x: auto;">
+                <table
+                  class={"table table-hover app-event-table"}
+                  style={"margin-bottom: 0;"}
+                >
                 <thead>
                   <tr>
                     <th class={"app-w-1"}></th>
@@ -1242,12 +1241,13 @@ export function Alerts() {
                   </For>
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </Transition>
         <Show when={visibleEvents().length > 0}>
           <div
-            class="mt-2"
+            class="mt-3"
             classList={{
               invisible: isLoading() && eventStore.events.length === 0,
             }}
@@ -1259,7 +1259,7 @@ export function Alerts() {
             />
           </div>
         </Show>
-      </Container>
+      </div>
     </>
   );
 }

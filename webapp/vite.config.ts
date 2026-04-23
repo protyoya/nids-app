@@ -10,6 +10,9 @@ export default defineConfig({
       "/sse": "http://127.0.0.1:5636",
     },
   },
+  resolve: {
+    preserveSymlinks: true,
+  },
   build: {
     target: "esnext",
     sourcemap: true,

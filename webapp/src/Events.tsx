@@ -349,9 +349,9 @@ export function Events() {
   return (
     <>
       <Top disableRange />
-      <Container fluid>
-        <Row>
-          <div class="col-auto mt-2 d-flex flex-wrap align-items-center gap-2">
+      <div style="padding: 0 1.5rem 2rem;">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem; margin-top: 0.5rem;">
+          <div class="d-flex flex-wrap align-items-center gap-2">
             <Show when={!isLoading()}>
               <button
                 class={"btn btn-primary app-refresh-button"}
@@ -386,7 +386,7 @@ export function Events() {
             </div>
           </div>
 
-          <Col class={"mt-2"}>
+          <div style="flex-grow: 1;">
             <Form
               class="input-group"
               onsubmit={(e) => {
@@ -429,59 +429,56 @@ export function Events() {
                 Clear
               </button>
             </Form>
-          </Col>
-        </Row>
+          </div>
+        </div>
 
         <Show when={filters().length != 0}>
           <FilterStrip filters={filters} setFilters={setFilters} />
         </Show>
 
-        <Row>
-          <div class={"col-md-6 col-sm-12 mt-2 me-auto"}></div>
-          <div class={"col-md-6 col-sm-12 mt-2"}>
-            <div class={"float-end"}>
-              <button
-                type="button"
-                class="btn btn-secondary ms-2"
-                onclick={gotoNewest}
-                disabled={isLoading()}
-              >
-                Newest
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary ms-2"
-                onclick={gotoNewer}
-                disabled={isLoading()}
-              >
-                Newer
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary ms-2"
-                onclick={gotoOlder}
-                disabled={isLoading()}
-              >
-                Older
-              </button>
-              <button
-                type="button"
-                class="btn btn-secondary ms-2"
-                onclick={gotoOldest}
-                disabled={isLoading()}
-              >
-                Oldest
-              </button>
-            </div>
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+          <div class="btn-group">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick={gotoNewest}
+              disabled={isLoading()}
+            >
+              Newest
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick={gotoNewer}
+              disabled={isLoading()}
+            >
+              Newer
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick={gotoOlder}
+              disabled={isLoading()}
+            >
+              Older
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              onclick={gotoOldest}
+              disabled={isLoading()}
+            >
+              Oldest
+            </button>
           </div>
-        </Row>
+        </div>
 
-        <Row>
-          <Col class={"mt-2"}>
-            <Transition name={"fade"}>
-              {events().length > 0 && (
-                <div>
-                  <table class={"table table-sm table-hover app-event-table"}>
+        <div style="margin-top: 1rem;">
+          <Transition name={"fade"}>
+            {events().length > 0 && (
+              <div class="bento-card" style="padding: 0; overflow: hidden;">
+                <div style="overflow-x: auto;">
+                  <table class={"table table-sm table-hover app-event-table"} style="margin-bottom: 0;">
                     <thead>
                       <tr>
                         <th class={"app-w-1"}></th>
@@ -616,11 +613,11 @@ export function Events() {
                     </tbody>
                   </table>
                 </div>
-              )}
-            </Transition>
-          </Col>
-        </Row>
-      </Container>
+              </div>
+            )}
+          </Transition>
+        </div>
+      </div>
     </>
   );
 }
